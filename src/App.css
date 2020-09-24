@@ -32,6 +32,10 @@ form {
   display: flex;
   flex-wrap: wrap;
 }
+fb{
+  width: 10px;
+  height: 50px;
+}
 .name{
   font-size: 10pt;
 }
@@ -127,10 +131,16 @@ input.error {
   flex-direction: column;
   margin-bottom: 15px;
 }
+.fb,.gl {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+  width: 50%;
+}
 
 .firstName,
 .lastName {
-  width: 49%;
+  width: 100%;
 }
 
 .email,

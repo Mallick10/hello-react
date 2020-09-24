@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
-import firebase from "firebase"
-import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth"
+import GoogleLogin from 'react-google-login'
+import Facebook from './Facebook'
+import axios from 'axios';
 
-firebase.initializeApp({
-  apiKey: "AIzaSyCUe4vDDkFUajHBXjYqXIfrbf5Pf-I0pVI",
-  authDomain: "bobbleai-5ddce.firebaseapp.com"
-})
 
 const emailRegex = RegExp(
   /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
@@ -29,24 +26,7 @@ const formValid = ({ formErrors, ...rest }) => {
 
 class App extends Component {
 
-  state = { isSignedIn: false }
-  uiConfig = {
-    signInFlow: "popup",
-    signInOptions: [
-      firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-      firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-    ],
-    callbacks: {
-      signInSuccess: () => false
-    }
-  }
-
-  componentDidMount = () => {
-    firebase.auth().onAuthStateChanged(user => {
-      this.setState({ isSignedIn: !!user })
-      console.log("user", user)
-    })
-  }
+  
 
 
   
@@ -71,13 +51,17 @@ class App extends Component {
     e.preventDefault();
 
     if (formValid(this.state)) {
-      console.log(`
-        --SUBMITTING--
-        First Name: ${this.state.firstName}
-        Last Name: ${this.state.lastName}
-        Email: ${this.state.email}
-        Password: ${this.state.password}
-      `);
+      const data = {
+        First_Name: this.state.firstName,
+        Last_Name: this.state.lastName,
+        Email: this.state.email,
+        Password : this.state.password
+      }
+      axios.post(`https://reqres.in/api/users`, { data })
+      .then(result => {
+        console.log(result);
+        console.log(result.data);
+      })
     } else {
       console.error("FORM INVALID - DISPLAY ERROR MESSAGE");
     }
@@ -112,37 +96,40 @@ class App extends Component {
 
     this.setState({ formErrors, [name]: value }, () => console.log(this.state));
   };
+
+  responseGoogle=(response)=>{
+    console.log(response);
+    console.log(response.profileObj);
+    
+    
+  }
   
 
   render(){
     const { formErrors } = this.state;
 
     return (
-      //Facebook and Google Authentication Part//
+      
       <div className="wrapper">
         <div className="form-wrapper">
+          
+          <div className="gl">
 
-          {this.state.isSignedIn ? (
-            <span>
-              
-              
-              <div className="profile-pic2">
-              <img className="profile-pic"
-                alt="profile picture"
-                src={firebase.auth().currentUser.photoURL}
-              />
-              </div>
-              <h1 className="name">Welcome {firebase.auth().currentUser.displayName}</h1>
-              <div className="SignIn">Signed In!</div>
-              <button className="SignOut" onClick={() => firebase.auth().signOut()}>Sign out!</button>
-
-            </span>
-          ) : (
-            <StyledFirebaseAuth
-              uiConfig={this.uiConfig}
-              firebaseAuth={firebase.auth()}
+            <GoogleLogin
+            clientId="346625909188-ndkast8r5u0f98iquvan031k9v8fthng.apps.googleusercontent.com"
+            buttonText="Login"
+            onSuccess={this.responseGoogle}
+            onFailure={this.responseGoogle}
+            cookiePolicy={'single_host_origin'}
+        
             />
-          )}
+            
+          </div>
+
+          <div className="fb">
+
+            <Facebook />
+          </div>
 
 
            
